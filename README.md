@@ -29,6 +29,7 @@ spy.called? #=> true
 spy.call_count #=> 1
 spy.calls[0].args #=> [1, 2]
 spy.calls[0].block #=> nil
+spy.calls[0].time #=> # Time of calling
 ```
 
 ### Fake
@@ -42,6 +43,32 @@ fake[:my_method].called? #=> true
 fake[:my_method].call_count #=> 1
 fake[:my_method].calls[0].args #=> [1, 2]
 fake.called_methods #=> [:my_method]
+```
+
+### Fake stubs
+
+```ruby
+fake = Stirlitz::Fake.new
+
+fake.stub(:find).with(3).and_return({ id: 3, name: 'John' })
+fake.stub(:find).with(4).and_return(id: 4, name: 'Jack')
+fake.stub(:where).with(name: 'Jack').and_return(id: 4, name: 'Jack')
+
+fake.find(3) #=> { id: 3, name: 'John' }
+fake.where(name: 'Jack') #=> { id: 4, name: 'Jack' }
+
+fake.called_methods #=> [:find, :where] # You catch the idea…
+```
+
+### Strict fakes
+
+```ruby
+fake = Stirlitz::Fake.new(true)
+
+fake.stub(:foo)
+
+fake.foo #=> Success
+fake.bar #=> NoMethodError
 ```
 
 ## Contributing
